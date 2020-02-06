@@ -1,10 +1,7 @@
 import { Service, Inject } from 'typedi'
 import jwt from 'jsonwebtoken'
 import config from '../config'
-import { randomBytes } from 'crypto'
-import { IUser, IUserInputDTO } from '../interfaces/IUser'
 import { EventDispatcher, EventDispatcherInterface } from '../decorators/eventDispatcher'
-import events from '../subscribers/events'
 
 @Service()
 export default class AuthService {
@@ -13,8 +10,9 @@ export default class AuthService {
     @Inject('activeDirectory') private ad,
     @Inject('database') private db,
     @EventDispatcher() private eventDispatcher: EventDispatcherInterface,
+    protected token: any,
   ) {}
-  public async SignIn(username: string, password: string) {
+  public async SignIn (username: string, password: string) {
     console.log(this.ad)
     let userRecord = (await this.db.query(`SELECT * FROM "controlAccesoShema".usuario WHERE usuario = '${username}'`)).rows
     console.log(userRecord[0])
@@ -22,27 +20,28 @@ export default class AuthService {
     if (userRecord.length === 0) {
       throw new Error('User not registered')
     }
-    const thos = this
-    try {
-      this.ad.authenticate(username, password, function(err: any, auth: any) {
-        if (err) {
-          console.log('🔥 Error on login with active directory: %o', err)
-        }
-        if (auth) {
-          console.log('Password validated!')
-          console.log('Generating JWT')
-          const token = thos.generateToken(userRecord[0])
-          return { userRecord, token }
-        } else {
-          throw new Error('Invalid Password')
-        }
-      })
-    } catch(error) {
-      console.log(error)
-    }
+    let auth = await this.authenticate(username, password, userRecord)
+    let token = await this.generateToken(userRecord[0])
+    console.log(auth)
+    console.log(token)
+    this.logger.silly(this.token)
   }
-
-  private generateToken(user: any) {
+  private async authenticate (username: any, password: any, record: any) {
+    this.logger.silly('checking authenticate')
+    const thos = this
+    await this.ad.authenticate((username + '@cobrandobpo.com.co'), password, function (err: any, auth: any) {
+      if (err) {
+        console.log('🔥 Error on login with active directory: %o', err)
+      }
+      if (auth) {
+        thos.logger.silly('Password validated!')
+      } else {
+        throw new Error('Invalid Password')
+      }
+    })
+    return true
+  }
+  private async generateToken (user: any) {
     const today = new Date()
     const exp = new Date(today)
     exp.setDate(today.getDate() + 60)
@@ -57,7 +56,7 @@ export default class AuthService {
      * more information here: https://softwareontheroad.com/you-dont-need-passport
      */
     this.logger.silly(`Sign JWT for userId: ${user.id}`)
-    return jwt.sign(
+    this.token = jwt.sign(
       {
         id: user.id, // We are gonna use this in the middleware 'isAuth'
         name: user.nombresCompleto,
@@ -65,5 +64,6 @@ export default class AuthService {
       },
       config.jwtSecret,
     )
+    return true
   }
 }

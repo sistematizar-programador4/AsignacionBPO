@@ -3,6 +3,8 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import routes from '../api'
 import config from '../config'
+import fileUpload from 'express-fileupload'
+
 export default ({ app }: { app: express.Application }) => {
   /**
    * Health Check endpoints
@@ -18,6 +20,8 @@ export default ({ app }: { app: express.Application }) => {
   app.head('/status', (req, res) => {
     res.status(200).end()
   })
+
+  app.use(fileUpload())
 
   // Useful if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
   // It shows the real origin IP in the heroku or Cloudwatch logs

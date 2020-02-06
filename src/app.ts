@@ -6,13 +6,10 @@ import express from 'express'
 
 import Logger from './loaders/logger'
 
-import fileUpload from 'express-fileupload'
-
-
 async function startServer () {
   const app = express()
   await require('./loaders').default({ expressApp: app })
-  app.use(fileUpload());
+
   app.listen(config.port, err => {
     if (err) {
       Logger.error(err)
