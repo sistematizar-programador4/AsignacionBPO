@@ -13,8 +13,8 @@ export default class AuthService {
     protected token: any,
   ) {}
   public async SignIn (username: string, password: string) {
-    console.log(this.ad)
-    let userRecord = (await this.db.query(`SELECT * FROM "controlAccesoShema".usuario WHERE usuario = '${username}'`)).rows
+    console.log(username)
+    let userRecord = (await this.db.query(`SELECT * FROM usuario WHERE usuariowin = '${username}'`)).rows
     console.log(userRecord[0])
     this.logger.silly('Checking username')
     if (userRecord.length === 0) {
@@ -22,14 +22,14 @@ export default class AuthService {
     }
     let auth = await this.authenticate(username, password, userRecord)
     let token = await this.generateToken(userRecord[0])
-    console.log(auth)
-    console.log(token)
-    this.logger.silly(this.token)
+    let user = userRecord[0]
+    return { user, token }
+
   }
   private async authenticate (username: any, password: any, record: any) {
     this.logger.silly('checking authenticate')
     const thos = this
-    await this.ad.authenticate((username + '@cobrandobpo.com.co'), password, function (err: any, auth: any) {
+    await this.ad.authenticate((username), password, function (err: any, auth: any) {
       if (err) {
         console.log('🔥 Error on login with active directory: %o', err)
       }
@@ -59,7 +59,7 @@ export default class AuthService {
     this.token = jwt.sign(
       {
         id: user.id, // We are gonna use this in the middleware 'isAuth'
-        name: user.nombresCompleto,
+        name: user.nombre,
         exp: exp.getTime() / 1000,
       },
       config.jwtSecret,

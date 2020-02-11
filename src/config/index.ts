@@ -32,4 +32,8 @@ export default {
   api: {
     prefix: '/api',
   },
+  sqlUsername: process.env.SQLUSER,
+  sqlPassword: process.env.SQLPASSWORD,
+  sqlDatabase: process.env.SQLDATABASE,
+  sqlServer: process.env.SQLSERVER
 }

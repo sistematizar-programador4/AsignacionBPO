@@ -15,17 +15,17 @@ export default class UploadFileService {
   public async upload (file: File, path: string) {
     let name = file.name
     let route = './' + path + '/' + name
-    console.log(route)
     await file.mv(route)
     let vdata = await this.validation(route)
     return { vdata }
   }
   private async validation (route: string) {
     try {
-      const data = []
-      const workSheetsFromFile = xlsx.parse(route)
-      const headers = workSheetsFromFile[0].data[0]
-      const columns = await this.db.query('SELECT * FROM shema_generico."camposEstructura"')
+      let data = []
+      let workSheetsFromFile = xlsx.parse(route)
+      let headers = workSheetsFromFile[0].data[0]
+      let columns = await this.db.query('SELECT * FROM shema_generico."camposEstructura"')
+      console.log(columns.rows)
       headers.forEach((it: any, index: any) => {
         let validation = columns.rows.find((it2: any) => it2.cabeceraArchivo === it)
         data.push({
@@ -39,7 +39,7 @@ export default class UploadFileService {
       console.log(e)
     }
   }
-  public async process (data: Array<[]>) { 
-
+  public async process (data: Array<[]>) {
+    console.log(data.filter(item => item.validation))
   }
 }

@@ -9,7 +9,7 @@ export default (app: Router) => {
   app.use('/asignacion', route)
 
   route.post(
-    '/upload',
+    '/subir',
     async (req: Request, res: Response, next: NextFunction) => {
       const logger = Container.get('logger')
       logger.debug('Calling UploadFile endpoint with body: %o', req.body)
@@ -21,6 +21,21 @@ export default (app: Router) => {
           const data = await uploadServiceInstance.upload(file,'uploads')
           return res.json({ 'data': data }).status(200)
         }
+      } catch (e) {
+        logger.error('🔥 error: %o', e)
+        return next(e)
+      }
+    },
+  )
+
+  route.post(
+    '/procesar',
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger = Container.get('logger')
+      logger.debug('Llamando endpoint procesar con body: ')
+      try {
+        const uploadServiceInstance = Container.get(UploadFileService)
+        const data = await uploadServiceInstance.process(req.body.data)
       } catch (e) {
         logger.error('🔥 error: %o', e)
         return next(e)

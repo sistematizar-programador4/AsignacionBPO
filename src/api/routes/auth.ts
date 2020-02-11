@@ -23,8 +23,8 @@ export default (app: Router) => {
       try {
         const { username, password } = req.body
         const authServiceInstance = Container.get(AuthService)
-        await authServiceInstance.SignIn(username, password)
-        return res.json().status(200)
+        const { user, token } = await authServiceInstance.SignIn(username, password)
+        return res.json({ user, token }).status(200)
       } catch (e) {
         logger.error('🔥 error: %o', e)
         return next(e)

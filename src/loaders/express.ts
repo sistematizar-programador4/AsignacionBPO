@@ -4,7 +4,8 @@ import cors from 'cors'
 import routes from '../api'
 import config from '../config'
 import fileUpload from 'express-fileupload'
-
+let http = require('http')
+let fs = require('fs')
 export default ({ app }: { app: express.Application }) => {
   /**
    * Health Check endpoints
@@ -30,7 +31,13 @@ export default ({ app }: { app: express.Application }) => {
   // The magic package that prevents frontend developers going nuts
   // Alternate description:
   // Enable Cross Origin Resource Sharing to all origins by default
-  app.use(cors())
+  app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:8080')
+    res.header('Access-Control-Allow-Credentials', true)
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+    next()
+  })
 
   // Some sauce that always add since 2014
   // "Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it."
