@@ -15,11 +15,11 @@ const getTokenFromHeader = (req: any) => {
    * @TODO Edge and Internet Explorer do some weird things with the headers
    * So I believe that this should handle more 'edge' cases )
    */
+  console.log(req.headers.authorization)
   if (
-    (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') ||
-    (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
+    (req.headers.authorization)
   ) {
-    return req.headers.authorization.split(' ')[1]
+    return req.headers.authorization
   }
   return null
 }

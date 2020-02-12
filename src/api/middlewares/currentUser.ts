@@ -10,13 +10,12 @@ const attachCurrentUser = async (req: any, res: any, next: any) => {
   const Logger = Container.get('logger')
   const db = Container.get('database')
   try {
-    let userRecord = (await db.query(`SELECT * FROM "controlAccesoShema".usuario WHERE id = '${req.toke.id}'`)).rows
-    if (!userRecord) {
+    let userRecord = (await db.query(`SELECT * FROM usuario WHERE id = '${req.token.id}'`)).rows
+    console.log(userRecord)
+    if (userRecord.length === 0) {
       return res.sendStatus(401)
     }
-    const currentUser = userRecord.toObject()
-    Reflect.deleteProperty(currentUser, 'password')
-    Reflect.deleteProperty(currentUser, 'salt')
+    const currentUser = userRecord[0]
     req.currentUser = currentUser
     return next()
   } catch (e) {

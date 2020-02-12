@@ -72,10 +72,14 @@ export default {
         async searchClient(){
             this.clients = (await axios.get('/clients/?user='+this.user)).data
             this.client = this.clients[0].id
-            console.log("nwn")
         },
         async signIn(){
-            await axios.post('/auth/signin',{username:this.user,password:this.password})
+          let email = this.user
+          let password = this.password
+          let client = this.client
+          this.$store.dispatch('login', { email, password, client })
+          .then(() => this.$router.push('/asignacion/'+client))
+          .catch(err => console.log(err))
         }
     },
 }
