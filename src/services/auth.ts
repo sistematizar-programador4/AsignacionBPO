@@ -15,7 +15,6 @@ export default class AuthService {
   public async SignIn (username: string, password: string, client: string) {
     let userRecord = (await this.db.query(`SELECT * FROM usuario WHERE usuariowin = '${username}'`)).rows
     let unitsRecord = (await this.db.query(`SELECT * FROM unidad WHERE idcliente = '${client}'`)).rows
-    console.log(unitsRecord)
     this.logger.silly('Checking username')
     if (userRecord.length === 0) {
       throw new Error('User not registered')

@@ -8,7 +8,7 @@
                 dark
                 flat
               >
-               <v-toolbar-title>Login form</v-toolbar-title>
+               <v-toolbar-title>Iniciar Sesión</v-toolbar-title>
               </v-toolbar>
               <v-card-text>
                 <v-form>
@@ -44,7 +44,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn @click="signIn" color="primary">Login</v-btn>
+                <v-btn @click="signIn" color="primary">Iniciar Sesión</v-btn>
               </v-card-actions>
             </v-card>
         </v-col>
@@ -64,10 +64,14 @@ export default {
             clients: Array({
                 id:null,
                 nombre:'Escriba el usuario'
-            })
+            }),
         }
     },
-    async mounted() {},
+    async mounted() {
+      if(localStorage.getItem('token')){
+        this.$router.push('/asignacion')
+      }
+    },
     methods: {
         async searchClient(){
             this.clients = (await axios.get('/clients/?user='+this.user)).data
@@ -78,7 +82,7 @@ export default {
           let password = this.password
           let client = this.client
           this.$store.dispatch('login', { email, password, client })
-          .then(() => this.$router.push('/asignacion/'+client))
+          .then(() => this.$router.push('/asignacion'))
           .catch(err => console.log(err))
         }
     },

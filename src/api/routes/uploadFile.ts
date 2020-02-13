@@ -14,11 +14,16 @@ export default (app: Router) => {
       const logger = Container.get('logger')
       logger.debug('Calling UploadFile endpoint with body: %o', req.body)
       try {
-        console.log(req.files)
+        console.log(req.body)
         if (req.files) {
-          const file = (req.files.temp)
+          const file = (req.files.file)
+          const unit = (req.body.unit)
+          const type = (req.body.type)
+          const state = (req.body.state)
+          const date_open = req.body.date_open
+          const date_close = req.body.date_close
           const uploadServiceInstance = Container.get(UploadFileService)
-          const data = await uploadServiceInstance.upload(file,'uploads')
+          const data = await uploadServiceInstance.upload(file,unit,type,state,date_open,date_close)
           return res.json({ 'data': data }).status(200)
         }
       } catch (e) {

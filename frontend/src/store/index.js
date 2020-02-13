@@ -35,14 +35,15 @@ export default new Vuex.Store({
     login({commit}, user){
       return new Promise((resolve, reject) => {
         commit('auth_request')
-        axios.post('/auth/signin',{username:user.email,password:user.password, client:user.client})
+        let client = user.client
+        axios.post('/auth/signin',{username:user.email,password:user.password, client:client})
         .then(resp => {
           let token = resp.data.token
           let user = resp.data.user
           let units = resp.data.unitsRecord
-          console.log(units)
-          console.log(user)
           localStorage.setItem('token', token)
+          localStorage.setItem('user', user)
+          localStorage.setItem('client', client)
           let payload = {'token':token,'user':user,'units': units}
           commit('auth_success', payload)
           resolve(resp)
@@ -53,7 +54,16 @@ export default new Vuex.Store({
           reject(err)
         })
       })
-    }
+    },
+    logout({commit}){
+      return new Promise((resolve) => {
+        commit('logout')
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('client')
+        resolve()
+      })
+    },
   },
   getters : {
     isLoggedIn: state => !!state.token,

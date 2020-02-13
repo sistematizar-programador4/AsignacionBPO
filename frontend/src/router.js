@@ -14,10 +14,9 @@ let router = new Router({
         component: Login
       },
       {
-        path: '/asignacion/:client',
+        path: '/asignacion',
         name: 'asignacion',
         component: Upload,
-        props: true,
         meta: { 
             requiresAuth: true
         }
