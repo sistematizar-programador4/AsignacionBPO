@@ -13,7 +13,7 @@
               <v-card-text>
                   <v-row align="center" justify="center">
                   <v-col cols="12">
-                    <v-file-input v-model="file" label="Archivo Asignación" @change="upload"></v-file-input>
+                    <v-file-input v-model="file" label="Archivo Asignación"></v-file-input>
                   </v-col>
                   <v-col cols="6">
                     <span style="font-size:18px">Unidad</span>
@@ -118,6 +118,9 @@
               </v-card-actions>
             </v-card>
         </v-col>
+        <v-overlay :value="overlay">
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
+        </v-overlay>
     </v-row>
   </v-container>
 </template>
@@ -132,9 +135,11 @@ export default {
             date2: new Date().toISOString().substr(0, 10),
             menu1:false,
             menu2:false,
+            overlay:false,
+            snackbar:false,
             type: '1',
             state: '1',
-            units:{},
+            units:[],
             types:[
                 {
                     id:'1',
@@ -163,7 +168,7 @@ export default {
         this.unit = this.units[0].id
     },
     methods: {
-        upload(){
+        async upload(){
           let formData = new FormData();
           formData.append('file', this.file);
           formData.append('unit', this.unit);
@@ -171,7 +176,11 @@ export default {
           formData.append('state', this.state);
           formData.append('date_open',this.date1)
           formData.append('date_close',this.date2)
-          axios.post('/asignacion/subir',formData)
+          this.overlay = true
+          await axios.post('/asignacion/subir',formData)
+          .then(res => console.log(res))
+          .catch(error => console.log(error))
+          this.overlay = false
         }
     },
 };

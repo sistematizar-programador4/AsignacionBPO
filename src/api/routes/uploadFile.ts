@@ -23,8 +23,9 @@ export default (app: Router) => {
           const date_open = req.body.date_open
           const date_close = req.body.date_close
           const uploadServiceInstance = Container.get(UploadFileService)
-          const data = await uploadServiceInstance.upload(file,unit,type,state,date_open,date_close)
-          return res.json({ 'data': data }).status(200)
+          const vdata = await uploadServiceInstance.processFile(file,unit,type,state,date_open,date_close)
+          console.log(vdata)
+          return res.json({ 'vdata': vdata }).status(200)
         }
       } catch (e) {
         logger.error('🔥 error: %o', e)

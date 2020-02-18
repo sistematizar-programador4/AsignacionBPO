@@ -48,18 +48,33 @@
               </v-card-actions>
             </v-card>
         </v-col>
+        <v-snackbar
+          v-model="snackbar"
+          color="success"
+        >
+          {{message}}
+          <v-btn
+            color="white"
+            text
+            @click="snackbar = false"
+          >
+            Close
+          </v-btn>
+        </v-snackbar>
     </v-row>
   </v-container>
 </template>
 
 <script>
 import axios from 'axios'
-
+import 'vuejs-noty/dist/vuejs-noty.css'
 export default {
     data() {
         return {
             user: null,
             password: null,
+            snackbar:false,
+            message: '',
             client: null,
             clients: Array({
                 id:null,
@@ -74,16 +89,32 @@ export default {
     },
     methods: {
         async searchClient(){
-            this.clients = (await axios.get('/clients/?user='+this.user)).data
-            this.client = this.clients[0].id
+            let clientsList = (await axios.get('/clients/?user='+this.user)).data
+            if(clientsList.length > 0){
+              this.clients = clientsList
+              this.client = this.clients[0].id
+            }else{
+              this.clients = Array({
+                id:null,
+                nombre:'Escriba el usuario'
+              })
+              this.client = null
+            }
         },
         async signIn(){
           let email = this.user
           let password = this.password
           let client = this.client
+          let thos = this
           this.$store.dispatch('login', { email, password, client })
-          .then(() => this.$router.push('/asignacion'))
-          .catch(err => console.log(err))
+          .then(() => {
+            thos.snackbar = true
+            thos.message = 'Inicio de Sesión exitoso!'
+            // this.$router.push('/asignacion')
+          })
+          .catch(err => {
+            thos.message = err
+          })
         }
     },
 }
